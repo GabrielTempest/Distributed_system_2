@@ -1,0 +1,13 @@
+{
+  "title": "SensorType",
+  "type": "string",
+  "enum": [
+    "BAROMETER",
+    "ANEMOMETER",
+    "RAINGAUGE",
+    "FLOODGAUGE",
+    "VIBRATION",
+    "TILT",
+    "SOILMOISTURE"
+  ]
+}

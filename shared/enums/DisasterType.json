@@ -1,0 +1,9 @@
+{
+  "title": "DisasterType",
+  "type": "string",
+  "enum": [
+    "FLOOD",
+    "TYPHOON",
+    "LANDSLIDE"
+  ]
+}

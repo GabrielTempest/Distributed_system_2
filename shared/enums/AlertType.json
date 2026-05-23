@@ -1,0 +1,10 @@
+{
+  "title": "AlertType",
+  "type": "string",
+  "enum": [
+    "GREEN", 
+    "YELLOW", 
+    "ORANGE", 
+    "RED"
+  ]
+}
