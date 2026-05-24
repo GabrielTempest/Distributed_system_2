@@ -1,0 +1,27 @@
+package distsys26.early_warning_system.dataclasses;
+
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Mapping correlation between Enums
+ */
+public final class Mapping {
+
+    /**
+     * Mapping of DisasterType to SensorType. 
+     * Each DisasterType is associated with a list of SensorTypes that are relevant for monitoring that type of disaster.
+     */
+    public static final HashMap<DisasterType, List<SensorType>> disasterToSensorMap = new HashMap<>(){{
+        put(DisasterType.FLOOD, List.of(
+            SensorType.FLOODGAUGE, SensorType.RAINGAUGE
+        ));
+        put(DisasterType.TYPHOON, List.of(
+            SensorType.RAINGAUGE, SensorType.ANEMOMETER, SensorType.BAROMETER
+        ));
+        put(DisasterType.LANDSLIDE, List.of(
+            SensorType.RAINGAUGE, SensorType.SOILMOISTURE, SensorType.TILT, SensorType.VIBRATION
+        ));
+    }};
+    
+}
