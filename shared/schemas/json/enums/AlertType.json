@@ -1,4 +1,5 @@
 {
+  "$id": "schemas/json/enums/AlertType.json",
   "title": "AlertType",
   "type": "string",
   "enum": [
