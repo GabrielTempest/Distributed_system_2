@@ -1,9 +1,9 @@
-package distsys26.early_warning_system.local_eoc.alert_classifying_service;
+package distsys26.local_eoc.sensor_reading_processor;
 
 import java.util.HashMap;
 import java.util.List;
 
-import distsys26.early_warning_system.dataclasses.enums.*;
+import distsys26.local_eoc.enums.*;
 
 /**
  * Mapping correlation between data for the alert classifier.

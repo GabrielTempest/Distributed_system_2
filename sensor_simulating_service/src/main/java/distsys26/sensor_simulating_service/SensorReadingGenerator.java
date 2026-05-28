@@ -6,7 +6,6 @@ import distsys26.sensor_simulating_service.models.*;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Random;
-import java.util.UUID;
 
 public final class SensorReadingGenerator {
     private static final Random random = new Random();
@@ -52,13 +51,14 @@ public final class SensorReadingGenerator {
     /**
      * Generates a fake sensor reading with random value based on the sensor type.
      * @param sensorType the type of sensor for which to generate the reading
+     * @param index the index of the sensor of the given type to generate the reading for (used to create unique sensor IDs)
      * @param shared_seeding_value a shared seeding value to ensure that readings from different sensors are correlated
      * @return a SensorReading object with the generated value
      */
-    public static final SensorReading generateRandomSensorReading(SensorType sensorType, double shared_seeding_value) {
+    public static final SensorReading generateRandomSensorReading(SensorType sensorType, int index, double shared_seeding_value) {
         SensorValue sensorValue = Mapping.sensorToGeneralValuesMap.get(sensorType);
         return new SensorReading(
-            sensorValue.sensorIdPrefix + "-" + UUID.randomUUID().toString(),
+            sensorValue.sensorIdPrefix + "-" + String.format("%08d", index),
             sensorType,
             generateSeedValue(sensorValue, shared_seeding_value),
             sensorValue.unit,
