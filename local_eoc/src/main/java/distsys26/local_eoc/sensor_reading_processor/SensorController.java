@@ -7,20 +7,26 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import distsys26.local_eoc.sensor_reading_processor.models.SensorReading;
 
+/**
+ * Controller to receive sensor readings via REST API and enqueue them for batch processing.
+ */
 @RestController
 @RequestMapping("/api/readings")
 public class SensorController {
+    /**
+     * Thread-safe queue to hold incoming sensor readings until they are processed in batches.
+     */
     public static final BlockingQueue<SensorReading> queue = new LinkedBlockingQueue<>(10000);
 
     @PostMapping
     public void receiveReading(@RequestBody SensorReading reading) {
         queue.offer(reading);
-        System.out.printf("ID: %s, type: %s, value: %f, unit: %s, timestamp: %s\n\n", 
-                    reading.getSensorId(), 
-                    reading.getSensorType(),
-                    reading.getValue(),
-                    reading.getUnit(),
-                    reading.getTimestamp()
-                );
+        // System.out.printf("ID: %s, type: %s, value: %f, unit: %s, timestamp: %s\n\n", 
+        //             reading.getSensorId(), 
+        //             reading.getSensorType(),
+        //             reading.getValue(),
+        //             reading.getUnit(),
+        //             reading.getTimestamp()
+        //         );
     }
 }

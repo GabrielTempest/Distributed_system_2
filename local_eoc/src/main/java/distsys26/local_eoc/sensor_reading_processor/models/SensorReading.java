@@ -1,6 +1,7 @@
 package distsys26.local_eoc.sensor_reading_processor.models;
 
 import distsys26.local_eoc.enums.SensorType;
+import lombok.*;
 
 public class SensorReading {
     private String sensorId;

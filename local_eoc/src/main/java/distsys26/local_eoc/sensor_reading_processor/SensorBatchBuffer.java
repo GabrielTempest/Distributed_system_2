@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SensorBatchBuffer {
 
-
     private final SensorProcessor processor = new SensorProcessor();
-
 
     @Scheduled(fixedRate = 5000)
     public void flush() {
