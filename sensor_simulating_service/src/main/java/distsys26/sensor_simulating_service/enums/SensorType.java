@@ -1,4 +1,4 @@
-package distsys26.early_warning_system.dataclasses;
+package distsys26.sensor_simulating_service.enums;
 
 /**
  * Enumeration for the different types of sensors that can be used in the early warning system. 

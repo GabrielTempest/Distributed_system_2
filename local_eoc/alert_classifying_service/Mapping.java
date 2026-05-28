@@ -1,10 +1,12 @@
-package distsys26.early_warning_system.dataclasses;
+package distsys26.early_warning_system.local_eoc.alert_classifying_service;
 
 import java.util.HashMap;
 import java.util.List;
 
+import distsys26.early_warning_system.dataclasses.enums.*;
+
 /**
- * Mapping correlation between Enums
+ * Mapping correlation between data for the alert classifier.
  */
 public final class Mapping {
 

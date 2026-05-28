@@ -1,4 +1,4 @@
-package distsys26.early_warning_system.dataclasses;
+package distsys26.sensor_simulating_service.enums;
 
 /**
  * Enumerations for alert levels (color code) in the early warning system.

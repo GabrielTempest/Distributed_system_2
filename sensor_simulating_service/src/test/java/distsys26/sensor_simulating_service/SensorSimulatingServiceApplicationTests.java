@@ -1,10 +1,10 @@
-package distsys26.early_warning_system;
+package distsys26.sensor_simulating_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EarlyWarningSystemApplicationTests {
+class SensorSimulatingServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
