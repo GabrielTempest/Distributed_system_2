@@ -1,7 +1,7 @@
 package distsys26.sensor_simulating_service;
 
 import distsys26.sensor_simulating_service.enums.SensorType;
-import distsys26.sensor_simulating_service.models.SensorReading;
+import distsys26.sensor_simulating_service.models.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,12 +29,12 @@ public class SensorSimulatorService {
     private ConcurrentHashMap<SensorType, Integer> sensorTypeToSensorCountMap = 
                     SensorReadingGenerator.generatedSensorCount();
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 2500)
     public void sendBarometer() {
         postReading(SensorType.BAROMETER);
     }
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 2500)
     public void sendAnemometer() {
         postReading(SensorType.ANEMOMETER);
     }
@@ -86,6 +86,11 @@ public class SensorSimulatorService {
             SensorReading reading = SensorReadingGenerator.generateRandomSensorReading(sensorType, i, sharedSeedingValue);
             post(reading);
         }
+        SensorValue sensorValue = Mapping.sensorToGeneralValuesMap.get(sensorType);
+        System.out.printf("Posted %d readings for sensor type: %s, seeding value: %f (%s), range: [%.2f, %.2f]\n", 
+                                sensorCount, sensorType, sharedSeedingValue, 
+                                sensorValue.unit, sensorValue.general_min, sensorValue.general_max
+                            );
         SensorReadingGenerator.updateSeedingValues(sensorType, sensorTypeToSeedingValueMap);
     }
 
