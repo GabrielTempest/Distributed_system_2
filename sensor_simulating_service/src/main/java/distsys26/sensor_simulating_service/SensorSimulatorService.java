@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.ResourceAccessException;
 
 /**
  * Service class responsible for simulating sensor readings and sending them to the local EOC.
@@ -101,8 +102,14 @@ public class SensorSimulatorService {
     private void post(SensorReading reading) {
         try {
             restTemplate.postForObject(EOC_URL, reading, String.class);
+        } catch (ResourceAccessException e) {
+            System.out.println("Failed to connect to the local EOC at " + EOC_URL + 
+                                ". Please ensure the local EOC is running and the URL is correct."
+                                );
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("An unexpected error occurred while posting sensor reading." + 
+                                    " Error message: " + e.getMessage()
+                                );
         }
     }
 

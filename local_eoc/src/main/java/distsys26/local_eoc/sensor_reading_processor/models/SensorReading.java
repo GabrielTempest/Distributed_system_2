@@ -1,6 +1,7 @@
 package distsys26.local_eoc.sensor_reading_processor.models;
 
 import distsys26.local_eoc.enums.SensorType;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Data
@@ -8,17 +9,18 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class SensorReading {
-
+    @NotBlank(message = "sensorId is required")
     private String sensorId;
 
-    @NonNull
+    @NotNull(message = "sensorType is required")
     private SensorType sensorType;
 
-    private double value;
+    @NotNull(message = "value is required")
+    private Double value;
 
-    @NonNull
+    @NotBlank(message = "unit is required")
     private String unit;
 
+    @NotBlank(message = "timestamp is required")
     private String timestamp;
-    
 }

@@ -3,13 +3,13 @@ package distsys26.local_eoc.sensor_reading_processor.models;
 import distsys26.local_eoc.enums.DisasterType;
 import distsys26.local_eoc.enums.AlertLevel;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
 
 @Data
-@AllArgsConstructor
 public class AlertMessage {
     private String event_id;
     @Value("${area.id}")
@@ -17,13 +17,24 @@ public class AlertMessage {
     private String timestamp;
     private DisasterType disasterType;
     private AlertLevel alertLevel;
-    private List<SensorReading> measurements;
+    private List<SensorScore> measurements;
 
-    public AlertMessage(String timestamp, DisasterType disasterType, AlertLevel alertLevel, List<SensorReading> measurements) {
+    @Builder
+    public AlertMessage(String timestamp, DisasterType disasterType, AlertLevel alertLevel, List<SensorScore> measurements) {
         this.event_id = UUID.randomUUID().toString();
         this.timestamp = timestamp;
         this.disasterType = disasterType;
         this.alertLevel = alertLevel;
-        this.measurements = measurements;
+        setMeasurements(measurements);
+    }
+
+    public void setMeasurements(List<SensorScore> measurements) {
+        if (measurements == null) {
+            this.measurements = new ArrayList<>();
+            return;
+        }
+        List<SensorScore> temp = new ArrayList<>(measurements);
+        temp.removeIf(score -> score == null);
+        this.measurements = temp;
     }
 }

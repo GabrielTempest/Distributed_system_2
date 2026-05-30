@@ -25,5 +25,19 @@ public final class Mapping {
             SensorType.RAINGAUGE, SensorType.SOILMOISTURE, SensorType.TILT, SensorType.VIBRATION
         ));
     }};
+
+    /**
+     * Mapping of SensorType to threshold values.
+     * Each SensorType is associated with an array of threshold values that determine the alert level based on the sensor reading.
+     */
+    public static final HashMap<SensorType, int[]> sensorReadingThresholds = new HashMap<>(){{
+        put(SensorType.FLOODGAUGE, new int[]{2, 5, 10});
+        put(SensorType.RAINGAUGE, new int[]{50, 100, 200});
+        put(SensorType.ANEMOMETER, new int[]{10, 20, 35});
+        put(SensorType.BAROMETER, new int[]{1000, 980, 950});
+        put(SensorType.SOILMOISTURE, new int[]{40, 60, 80});
+        put(SensorType.TILT, new int[]{5, 15, 30});
+        put(SensorType.VIBRATION, new int[]{1, 4, 8});
+    }};
     
 }

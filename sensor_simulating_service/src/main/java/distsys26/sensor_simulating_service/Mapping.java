@@ -18,7 +18,7 @@ public final class Mapping {
         put(SensorType.ANEMOMETER, new SensorValue(0, 60, "m/s", "ANM"));
         put(SensorType.BAROMETER, new SensorValue(300, 1100, "hPa", "BM"));
         put(SensorType.SOILMOISTURE, new SensorValue(0, 100, "%", "SM"));
-        put(SensorType.TILT, new SensorValue(-90, 90, "degrees", "TL"));
+        put(SensorType.TILT, new SensorValue(0, 90, "degrees", "TL"));
         put(SensorType.VIBRATION, new SensorValue(0, 16, "g", "VBR"));
     }};
     
