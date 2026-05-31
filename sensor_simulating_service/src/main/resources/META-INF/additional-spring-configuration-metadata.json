@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "api.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL of the Local EOC REST API (e.g. http://localhost:8081)."
+    }
+  ]
+}
