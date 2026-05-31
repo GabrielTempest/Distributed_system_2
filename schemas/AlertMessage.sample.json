@@ -1,0 +1,27 @@
+{
+  "event_id": "550e8400-e29b-41d4-a716-446655440000",
+  "area_id": "HCM",
+  "timestamp": "2026-05-31T14:30:00Z",
+  "disaster_type": "FLOOD",
+  "alert_level": "RED",
+  "measurements": [
+    {
+      "sensor_type": "WATER_LEVEL",
+      "value": 2.8,
+      "unit": "m",
+      "confidence": 0.95
+    },
+    {
+      "sensor_type": "RAINFALL",
+      "value": 450,
+      "unit": "mm/h",
+      "confidence": 0.92
+    },
+    {
+      "sensor_type": "TEMPERATURE",
+      "value": 28.5,
+      "unit": "°C",
+      "confidence": 0.98
+    }
+  ]
+}
