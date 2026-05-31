@@ -4,7 +4,7 @@ public class SensorValue {
     public double general_min;
     public double general_max;
     public double range;
-    public String unit;    
+    public String unit;
     public String sensorIdPrefix;
 
     public SensorValue(double general_min, double general_max, String unit, String sensorIdPrefix) {
