@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "eoc.alerts.topic",
+      "type": "java.lang.String",
+      "description": "Kafka topic name from which disaster alerts are consumed."
+    }
+  ]
+}
