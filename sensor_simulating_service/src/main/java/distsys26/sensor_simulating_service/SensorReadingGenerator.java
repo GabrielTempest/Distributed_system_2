@@ -5,10 +5,12 @@ import distsys26.sensor_simulating_service.models.*;
 
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
+
 import java.util.Random;
 
 public final class SensorReadingGenerator {
     private static final Random random = new Random();
+    private static int fluctuation_percentage = 10;
 
     public static final ConcurrentHashMap<SensorType, Integer> generatedSensorCount() {
         ConcurrentHashMap<SensorType, Integer> sensorCountMap = new ConcurrentHashMap<>();
@@ -44,7 +46,8 @@ public final class SensorReadingGenerator {
                                     ConcurrentHashMap<SensorType, Double> sensorTypeToSeedingValueMap
     ) {
         double currentSeedingValue = sensorTypeToSeedingValueMap.get(sensorType);
-        double fluctuation = random.nextDouble() * 0.06 - 0.03; // -3% to +3%
+        double fluctuation_rate = (double) fluctuation_percentage / 100;
+        double fluctuation = random.nextDouble() * fluctuation_rate*2 - fluctuation_rate;
         sensorTypeToSeedingValueMap.put(sensorType, currentSeedingValue * (1 + fluctuation));
     }
 

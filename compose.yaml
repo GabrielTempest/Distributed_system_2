@@ -23,11 +23,26 @@ services:
       timeout: 5s
       retries: 10
 
+  redpanda-init:
+    image: redpandadata/redpanda:latest
+    container_name: redpanda-init
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "rpk topic create disaster-alerts
+        --brokers redpanda:9092
+        --partitions 3
+        --replicas 1 || true"
+    restart: "no"
+
   redpanda-console:
     image: redpandadata/console:latest
     container_name: redpanda-console
     depends_on:
-      - redpanda
+      redpanda:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:

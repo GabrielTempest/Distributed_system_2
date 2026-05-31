@@ -1,6 +1,8 @@
 package distsys26.local_eoc.sensor_reading_processor;
 
 import distsys26.local_eoc.sensor_reading_processor.models.SensorReading;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Service
 public class SensorBatchBuffer {
+    private static final Logger log = LoggerFactory.getLogger(SensorBatchBuffer.class);
 
     private final SensorProcessor processor;
 
@@ -23,6 +26,6 @@ public class SensorBatchBuffer {
         if (!batch.isEmpty()) {
             processor.process(batch);
         }
-        System.out.println("Flushed batch of size: " + batch.size());
+        log.debug("Flushed batch of size: {}", batch.size());
     }
 }

@@ -1,67 +1,26 @@
 package distsys26.local_eoc.sensor_reading_processor.models;
 
 import distsys26.local_eoc.enums.SensorType;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SensorReading {
+    @NotBlank(message = "sensorId is required")
     private String sensorId;
+
+    @NotNull(message = "sensorType is required")
     private SensorType sensorType;
-    private double value;
+
+    @NotNull(message = "value is required")
+    private Double value;
+
+    @NotBlank(message = "unit is required")
     private String unit;
+
+    @NotBlank(message = "timestamp is required")
     private String timestamp;
-
-    public SensorReading() {}
-
-    public SensorReading(
-            String sensorId,
-            SensorType sensorType,
-            double value,
-            String unit,
-            String timestamp) {
-
-        this.sensorId = sensorId;
-        this.sensorType = sensorType;
-        this.value = value;
-        this.unit = unit;
-        this.timestamp = timestamp;
-    }
-
-    public String getSensorId() {
-        return sensorId;
-    }
-
-    public void setSensorId(String sensorId) {
-        this.sensorId = sensorId;
-    }
-
-    public SensorType getSensorType() {
-        return sensorType;
-    }
-
-    public void setSensorType(SensorType sensorType) {
-        this.sensorType = sensorType;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public void setValue(double value) {
-        this.value = value;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
 }

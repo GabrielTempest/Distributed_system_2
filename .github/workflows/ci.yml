@@ -15,45 +15,29 @@ jobs:
         uses: actions/checkout@v4
 
       # -------------------------
-      # Python setup
+      # Java setup
       # -------------------------
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
         with:
-          python-version: '3.11'
-          cache: pip
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          java-version: '21'
+          distribution: 'temurin'
 
       # -------------------------
-      # Generate shared enums
+      # Build and test all services
       # -------------------------
-      - name: Generate enums
-        run: |
-          python shared/scripts/generate-enums.py
+      - name: Build national_eoc
+        run: mvn -f national_eoc/pom.xml clean verify
 
-      # -------------------------
-      # Verify generated code committed
-      # -------------------------
-      - name: Check generated files
-        run: |
-          git diff --exit-code
+      - name: Build local_eoc
+        run: mvn -f local_eoc/pom.xml clean verify
 
-      # -------------------------
-      # Python tests
-      # -------------------------
-      - name: Run Python tests
-        env:
-          PYTHONPATH: .
-        run: |
-          python -m pytest
+      - name: Build sensor_simulating_service
+        run: mvn -f sensor_simulating_service/pom.xml clean verify
 
       # -------------------------
       # Validate Docker Compose
       # -------------------------
       - name: Validate Docker Compose
         run: |
-          docker compose -f docker-compose.yml config
+          docker compose -f compose.yaml config

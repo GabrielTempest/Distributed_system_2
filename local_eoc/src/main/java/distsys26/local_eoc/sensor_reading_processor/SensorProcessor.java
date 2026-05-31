@@ -2,7 +2,7 @@ package distsys26.local_eoc.sensor_reading_processor;
 
 import distsys26.local_eoc.alert_publisher.AlertPublisher;
 import distsys26.local_eoc.alert_publisher.models.Alert;
-import distsys26.local_eoc.enums.AlertType;
+import distsys26.local_eoc.enums.AlertLevel;
 import distsys26.local_eoc.enums.DisasterType;
 import distsys26.local_eoc.enums.SensorType;
 import distsys26.local_eoc.sensor_reading_processor.models.SensorReading;
@@ -50,13 +50,13 @@ public class SensorProcessor {
                 ));
 
         for (DisasterType disaster : DisasterType.values()) {
-            AlertType current = classify(disaster, averages);
-            AlertType last = cache.getLastPublished(disaster);
+            AlertLevel current = classify(disaster, averages);
+            AlertLevel last = cache.getLastPublished(disaster);
 
             if (current == last) continue;
 
             cache.setLastPublished(disaster, current);
-            String msg = current == AlertType.GREEN
+            String msg = current == AlertLevel.GREEN
                     ? disaster + " all-clear: levels returned to normal."
                     : buildMessage(disaster, current, averages);
             alertPublisher.publish(new Alert(
@@ -70,14 +70,14 @@ public class SensorProcessor {
         }
     }
 
-    private AlertType classify(DisasterType disaster, Map<SensorType, Double> averages) {
+    private AlertLevel classify(DisasterType disaster, Map<SensorType, Double> averages) {
         double maxSeverity = 0.0;
         for (SensorType sensor : Mapping.disasterToSensorMap.get(disaster)) {
             Double avg = averages.get(sensor);
             if (avg == null) continue;
             maxSeverity = Math.max(maxSeverity, normalize(sensor, avg));
         }
-        return toAlertType(maxSeverity);
+        return toAlertLevel(maxSeverity);
     }
 
     private double normalize(SensorType sensor, double value) {
@@ -90,14 +90,14 @@ public class SensorProcessor {
         return Math.min(1.0, Math.abs(value) / (range / 2));
     }
 
-    private AlertType toAlertType(double severity) {
-        if (severity < 0.4) return AlertType.GREEN;
-        if (severity < 0.6) return AlertType.YELLOW;
-        if (severity < 0.8) return AlertType.ORANGE;
-        return AlertType.RED;
+    private AlertLevel toAlertLevel(double severity) {
+        if (severity < 0.4) return AlertLevel.GREEN;
+        if (severity < 0.6) return AlertLevel.YELLOW;
+        if (severity < 0.8) return AlertLevel.ORANGE;
+        return AlertLevel.RED;
     }
 
-    private String buildMessage(DisasterType disaster, AlertType level,
+    private String buildMessage(DisasterType disaster, AlertLevel level,
                                 Map<SensorType, Double> averages) {
         StringBuilder sb = new StringBuilder()
                 .append(disaster).append(" alert ").append(level).append(". Readings: ");
