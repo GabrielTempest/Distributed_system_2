@@ -1,6 +1,6 @@
 package distsys26.local_eoc.sensor_reading_processor.models;
 
-import distsys26.local_eoc.enums.SensorType;
+import distsys26.local_eoc.enums.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -23,4 +23,14 @@ public class SensorScore {
     private String unit;
 
     private int score;
+
+    @Override
+    public String toString() {
+        return "SensorScore{" +
+                "sensorType=" + sensorType +
+                ", value=" + value +
+                ", unit='" + unit + '\'' +
+                ", score=" + AlertLevel.fromInt(score).name() +
+                '}';
+    }
 }

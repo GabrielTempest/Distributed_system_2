@@ -10,7 +10,7 @@ import java.util.Random;
 
 public final class SensorReadingGenerator {
     private static final Random random = new Random();
-    private static int fluctuation_percentage = 10;
+    private static int fluctuation_percentage = 30;
 
     public static final ConcurrentHashMap<SensorType, Integer> generatedSensorCount() {
         ConcurrentHashMap<SensorType, Integer> sensorCountMap = new ConcurrentHashMap<>();
