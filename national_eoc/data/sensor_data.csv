@@ -1,0 +1,59 @@
+# ============================================================
+# Vietnam Disaster EOC — Sensor Grid  |  Fake Data CSV
+# ============================================================
+
+[NODES]
+# id, name_en, name_vn, type, latitude, longitude, status, battery, signal, last_seen
+HN,Hanoi,Hà Nội,HEAD_EOC,21.0285,105.8542,OK,98,95,2024-06-01 08:00:01
+HP,Hai Phong,Hải Phòng,LOCAL,20.8449,106.6881,OK,87,88,2024-06-01 08:00:03
+NA,Nghe An,Nghệ An,LOCAL,18.6796,105.6813,OK,76,72,2024-06-01 07:59:45
+DN,Da Nang,Đà Nẵng,LOCAL,16.0471,108.2068,OK,91,90,2024-06-01 08:00:05
+HCM,Ho Chi Minh,Hồ Chí Minh,LOCAL,10.8231,106.6297,OK,84,93,2024-06-01 08:00:02
+BD,Binh Duong,Bình Dương,NEIGHBOR,11.1684,106.6516,OK,62,67,2024-06-01 07:58:30
+VT,Vung Tau,Vũng Tàu,NEIGHBOR,10.3460,107.0843,OK,55,61,2024-06-01 07:57:12
+CT,Can Tho,Cần Thơ,LOCAL,10.0341,105.7876,OK,79,80,2024-06-01 08:00:00
+
+[SCENARIOS]
+S001,Typhoon Alert,Cat-5 typhoon — central coast,CRITICAL,DN,sensor.DN,#56b6c2
+S002,Area Goes Dark,Infrastructure collapse in Vũng Tàu,HIGH,VT,alerts.local,#e06c75
+S003,Network Error,Sensor cluster failure — Bình Dương,MEDIUM,BD,sensor.BD,#e5c07b
+S004,Flood Warning,Rising water levels in Mekong Delta,HIGH,CT,sensor.CT,#c678dd
+S005,Power Outage,Grid failure detected — Nghệ An province,MEDIUM,NA,sensor.NA,#98c379
+
+[KAFKA_QUEUES]
+sensor.{area_id},Raw sensor telemetry stream,SENSOR,sensor_id,false
+alerts.local → .neighbor → .head,Alert escalation pipeline,ALERT,area_id,true
+db.write / retry.{svc} / dlq,Database write and dead-letter queues,INFRASTRUCTURE,service_id,false
+
+[EVENT_LOG_TEMPLATES]
+TYPHOON_ALERT,[{time}] INFO  | Typhoon track updated — landfall ETA 6h — node {node} elevated to CRITICAL
+TYPHOON_ALERT,[{time}] WARN  | Wind speed 245 km/h recorded at sensor cluster {node}-S3
+TYPHOON_ALERT,[{time}] INFO  | Cascading alert: {node} → neighbors → Head EOC
+TYPHOON_ALERT,[{time}] WARN  | Kafka topic sensor.{node} partition lag +1240 msgs
+TYPHOON_ALERT,[{time}] INFO  | DB write batch queued — retry.eoc-writer active
+TYPHOON_ALERT,[{time}] ERROR | Sensor {node}-S7 offline — battery critically low (4%)
+TYPHOON_ALERT,[{time}] INFO  | Head EOC acknowledged — emergency protocol ALPHA activated
+AREA_DARK,[{time}] ERROR | Node {node} — ALL sensors OFFLINE
+AREA_DARK,[{time}] ERROR | Infrastructure collapse detected — power grid down
+AREA_DARK,[{time}] WARN  | alert.local dispatched to neighbors HP, HCM
+AREA_DARK,[{time}] INFO  | DLQ accumulating — {node} write pipeline paused
+AREA_DARK,[{time}] WARN  | Failover to satellite uplink initiated
+AREA_DARK,[{time}] ERROR | Kafka broker {node}-broker-2 unreachable
+AREA_DARK,[{time}] INFO  | Head EOC notified — search & rescue on standby
+NETWORK_ERROR,[{time}] WARN  | Sensor cluster {node} — packet loss 78%
+NETWORK_ERROR,[{time}] WARN  | retry.{node}-svc activated — attempt 1/5
+NETWORK_ERROR,[{time}] INFO  | Partition rebalance triggered on sensor.{node}
+NETWORK_ERROR,[{time}] WARN  | retry.{node}-svc activated — attempt 2/5
+NETWORK_ERROR,[{time}] ERROR | retry.{node}-svc — max retries exceeded, routing to DLQ
+NETWORK_ERROR,[{time}] INFO  | Neighbor nodes HP, HCM assuming relay role
+NETWORK_ERROR,[{time}] INFO  | Connectivity partially restored — 3/8 sensors online
+FLOOD_WARNING,[{time}] WARN  | Water level at {node}-gauge-4: +2.3m above baseline
+FLOOD_WARNING,[{time}] WARN  | Mekong tributary flow rate critical — 4200 m³/s
+FLOOD_WARNING,[{time}] INFO  | Evacuation zones alpha, bravo flagged in database
+FLOOD_WARNING,[{time}] ERROR | Sensor {node}-S12 submerged — connection lost
+FLOOD_WARNING,[{time}] INFO  | Alert cascaded to Head EOC — flood protocol DELTA active
+POWER_OUTAGE,[{time}] ERROR | Grid failure — {node} primary power lost
+POWER_OUTAGE,[{time}] INFO  | Node {node} switching to UPS backup — estimated 4h runtime
+POWER_OUTAGE,[{time}] WARN  | Battery-backed sensors at {node}: 5/8 operational
+POWER_OUTAGE,[{time}] INFO  | Alert dispatched upward: {node} → Head EOC
+POWER_OUTAGE,[{time}] WARN  | UPS at {node} — 60% capacity remaining

@@ -12,11 +12,6 @@ public class UIConsumer {
 
     @KafkaListener(topics = "${eoc.alerts.topic}", groupId = "national-eoc-ui")
     public void consume(Alert alert) {
-        log.info(">>> ALERT RECEIVED from {}: [{} / {}] at {} — {}",
-                alert.getLocalEocId(),
-                alert.getDisasterType(),
-                alert.getAlertType(),
-                alert.getTimestamp(),
-                alert.getMessage());
+        
     }
 }
