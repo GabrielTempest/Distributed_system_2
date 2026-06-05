@@ -6,7 +6,7 @@ import java.util.List;
 
 import distsys26.local_eoc.enums.*;
 import distsys26.local_eoc.sensor_reading_processor.Mapping;
-import distsys26.local_eoc.sensor_reading_processor.models.AlertMessage;
+import distsys26.local_eoc.sensor_reading_processor.models.AlertData;
 import distsys26.local_eoc.sensor_reading_processor.models.SensorScore;
 
 public abstract class Stamper {
@@ -24,7 +24,7 @@ public abstract class Stamper {
      * @param prebuildAlert a prebuild alert with disaster type and timestamp
      * @return an full alert, or null if all relevant sensor scores for the disaster type are not present
      */
-    public AlertMessage stamp(HashMap<SensorType, SensorScore> scores, AlertMessage prebuildAlert) {
+    public AlertData stamp(HashMap<SensorType, SensorScore> scores, AlertData prebuildAlert) {
         // Get relevant sensor scores in order for alert message measurements
         List<SensorScore> measurements = getRelevantScoresInOrder(scores);
         if (measurements == null) {

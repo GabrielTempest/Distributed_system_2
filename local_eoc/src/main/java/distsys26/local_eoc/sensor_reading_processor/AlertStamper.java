@@ -16,11 +16,11 @@ public final class AlertStamper {
      * @param scores A HashMap mapping each SensorType to its corresponding SensorScore.
      * @return A list of AlertMessage objects containing the details of the alerts to be sent to the EOC.
      */
-    public static List<AlertMessage> stamp(HashMap<SensorType, SensorScore> scores, String timestamp) {
-        List<AlertMessage> alerts = new ArrayList<>();
-        AlertMessage alert;
+    public static List<AlertData> stamp(HashMap<SensorType, SensorScore> scores) {
+        List<AlertData> alerts = new ArrayList<>();
+        AlertData alert;
         for (DisasterType disasterType : DisasterType.values()) {
-            alert = stampAlert(scores, disasterType, timestamp);
+            alert = stampAlert(scores, disasterType);
             if (alert != null) {
                 alerts.add(alert);
             }
@@ -37,18 +37,16 @@ public final class AlertStamper {
      * @param disasterType The type of disaster to determine the stamping logic.
      * @return An AlertMessage object containing the details of the alert to be sent to the EOC.
      */
-    private static AlertMessage stampAlert(HashMap<SensorType, SensorScore> scores, 
-                                            DisasterType disasterType, 
-                                            String timestamp
+    private static AlertData stampAlert(HashMap<SensorType, SensorScore> scores, 
+                                            DisasterType disasterType
                                             ) {
         // Check if the disaster type is supported
         if (!Mapping.disasterToSensorMap.containsKey(disasterType)) {
             return null;
         }
 
-        // Prebuild alert message with timestamp and disaster type, measurements and alert level will be set in the stamper
-        AlertMessage prebuildAlert = AlertMessage.builder()
-                .timestamp(timestamp)
+        // Prebuild alert message with the disaster type, measurements and alert level will be set in the stamper
+        AlertData prebuildAlert = AlertData.builder()
                 .disasterType(disasterType)
                 .build();
 

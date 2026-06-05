@@ -41,6 +41,8 @@ A distributed system that ingests sensor readings, classifies disaster risk leve
 .\run.ps1
 ```
 
+Due to some limitaions the current version of `run.ps1` only starts the Spring Boot services, not Redpanda. You must start Redpanda manually first
+
 Opens Redpanda, then spawns a new terminal window for each Spring Boot service in the correct startup order.
 
 ### Linux / macOS / WSL
