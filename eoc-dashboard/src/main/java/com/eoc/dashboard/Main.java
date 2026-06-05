@@ -2,6 +2,7 @@ package com.eoc.dashboard;
 
 import com.eoc.dashboard.model.*;
 import com.eoc.dashboard.service.*;
+import com.eoc.dashboard.service.AlertFeedPoller;
 import com.eoc.dashboard.view.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -78,20 +79,23 @@ public class Main extends Application {
             return n;
         });
 
+        AlertTablePanel alertTablePanel = safeBuild("AlertTablePanel", errors, AlertTablePanel::new);
+
         if (scenarioPanel != null) scenarioPanel.setOnScenarioSelected(sim::runScenario);
         sim.addNodeChangeListener(node -> {
             if (nodeStatusPanel != null) nodeStatusPanel.updateNode(node);
         });
 
-        // // Map only updates on scenario status changes (not jitter)
-        // sim.addScenarioChangeListener(node -> {
-        //     if (mapPanel != null) mapPanel.updateNode(node);
-        // });
+        // Start alert feed poller — polls national_eoc UIConsumer every 3 s
+        if (alertTablePanel != null) {
+            AlertFeedPoller alertPoller = new AlertFeedPoller(alertTablePanel::setAlerts);
+            alertPoller.start();
+            stage.setOnCloseRequest(e -> alertPoller.stop());
+        }
 
-        // ---- Root layout: HBox(map | right) inside BorderPane ----
-        // Avoid SplitPane + ScrollPane nesting which breaks on some JavaFX/Windows combos
+        // ---- Layout: HBox(map | right column) ----
 
-        // Map column — fixed width, scrollable vertically
+        // Map column — fixed width
         VBox mapColumn = new VBox();
         mapColumn.setStyle("-fx-background-color: #060e18;");
         mapColumn.setPrefWidth(380);
@@ -102,36 +106,42 @@ public class Main extends Application {
             mapColumn.getChildren().add(mapPanel);
         }
 
-        // Right column — fills remaining space
+        // Top-right: scenarios + kafka + event log + node status (scrollable)
+        VBox topRight = new VBox();
+        topRight.setStyle("-fx-background-color: #070e18;");
+        if (scenarioPanel   != null) topRight.getChildren().add(scenarioPanel);
+        if (kafkaPanel      != null) topRight.getChildren().add(kafkaPanel);
+        if (eventLogPanel   != null) topRight.getChildren().add(eventLogPanel);
+        if (nodeStatusPanel != null) topRight.getChildren().add(nodeStatusPanel);
+
+        ScrollPane topRightScroll = new ScrollPane(topRight);
+        topRightScroll.setFitToWidth(true);
+        topRightScroll.setFitToHeight(false);
+        topRightScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        topRightScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        topRightScroll.setStyle("-fx-background-color: #070e18; -fx-background: #070e18;");
+        topRightScroll.setPrefHeight(480);
+
+        // Right column: scrollable panels on top, alert table filling the rest
         VBox rightColumn = new VBox();
-        rightColumn.setStyle("-fx-background-color: #070e18;");
+        rightColumn.setStyle("-fx-background-color: #060e18;");
         HBox.setHgrow(rightColumn, Priority.ALWAYS);
-        if (scenarioPanel   != null) rightColumn.getChildren().add(scenarioPanel);
-        if (kafkaPanel      != null) rightColumn.getChildren().add(kafkaPanel);
-        if (eventLogPanel   != null) rightColumn.getChildren().add(eventLogPanel);
-        if (nodeStatusPanel != null) rightColumn.getChildren().add(nodeStatusPanel);
+        rightColumn.getChildren().add(topRightScroll);
+        if (alertTablePanel != null) {
+            VBox.setVgrow(alertTablePanel, Priority.ALWAYS);
+            rightColumn.getChildren().add(alertTablePanel);
+        }
 
-        // Wrap right column in scroll
-        ScrollPane rightScroll = new ScrollPane(rightColumn);
-        rightScroll.setFitToWidth(true);
-        rightScroll.setFitToHeight(false);
-        rightScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        rightScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        rightScroll.setStyle("-fx-background-color: #070e18; -fx-background: #070e18;");
-        HBox.setHgrow(rightScroll, Priority.ALWAYS);
-
-        // Divider line between map and right panel
         Region divider = new Region();
         divider.setPrefWidth(1);
         divider.setMinWidth(1);
         divider.setMaxWidth(1);
         divider.setStyle("-fx-background-color: #0e1e2e;");
 
-        // Main body
         HBox body = new HBox();
         body.setStyle("-fx-background-color: #060e18;");
         VBox.setVgrow(body, Priority.ALWAYS);
-        body.getChildren().addAll(mapColumn, divider, rightScroll);
+        body.getChildren().addAll(mapColumn, divider, rightColumn);
 
         // Full root
         VBox root = new VBox();
