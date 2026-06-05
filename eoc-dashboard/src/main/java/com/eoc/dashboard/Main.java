@@ -73,20 +73,26 @@ public class Main extends Application {
             return n;
         });
 
+        LiveSensorPanel liveSensorPanel = safeBuild("LiveSensorPanel", errors, LiveSensorPanel::new);
+
         if (scenarioPanel != null) scenarioPanel.setOnScenarioSelected(sim::runScenario);
         sim.addNodeChangeListener(node -> {
             if (nodeStatusPanel != null) nodeStatusPanel.updateNode(node);
         });
 
         LiveAlertPoller poller = new LiveAlertPoller(sim);
+        if (liveSensorPanel != null) {
+            poller.setOnSensorUpdate(liveSensorPanel::updateReadings);
+        }
         poller.start();
         stage.setOnCloseRequest(e -> poller.stop());
 
-        // Left column: Scenarios + Node Status
+        // Left column: Scenarios + Node Status + Live Sensor Readings
         VBox leftColumn = new VBox();
         leftColumn.setStyle("-fx-background-color: #060e18;");
-        if (scenarioPanel   != null) leftColumn.getChildren().add(scenarioPanel);
-        if (nodeStatusPanel != null) leftColumn.getChildren().add(nodeStatusPanel);
+        if (scenarioPanel    != null) leftColumn.getChildren().add(scenarioPanel);
+        if (nodeStatusPanel  != null) leftColumn.getChildren().add(nodeStatusPanel);
+        if (liveSensorPanel  != null) leftColumn.getChildren().add(liveSensorPanel);
 
         ScrollPane leftScroll = new ScrollPane(leftColumn);
         leftScroll.setFitToWidth(true);

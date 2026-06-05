@@ -4,7 +4,6 @@ import com.eoc.dashboard.model.*;
 import com.eoc.dashboard.model.SensorNode.NodeStatus;
 import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.util.Duration;
 
@@ -56,7 +55,6 @@ public class SimulationService {
     public void loadNodes(List<SensorNode> nodes) {
         nodeMap.clear();
         for (SensorNode n : nodes) nodeMap.put(n.getId(), n);
-        startJitterLoop();
     }
 
     public ObservableList<String> getEventLog() { return eventLog; }
@@ -135,36 +133,6 @@ public class SimulationService {
     }
 
     // ------------------------------------------------------------------ //
-    //  Background jitter loop (simulates live sensor noise)
-    // ------------------------------------------------------------------ //
-
-    private void startJitterLoop() {
-        Random rng = new Random();
-
-        Timeline jitter = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
-            // Pick a random node to jitter
-            List<SensorNode> all = new ArrayList<>(nodeMap.values());
-            if (all.isEmpty()) return;
-            SensorNode n = all.get(rng.nextInt(all.size()));
-
-            // Only jitter if no active critical scenario on this node
-            if (activeScenario != null
-                    && activeScenario.getTargetNodeId().equals(n.getId())
-                    && n.getStatus() == NodeStatus.ERROR) return;
-
-            int batt   = Math.max(10, Math.min(100, n.getBattery() + rng.nextInt(5) - 2));
-            int signal = Math.max(20, Math.min(100, n.getSignal()  + rng.nextInt(7) - 3));
-            n.setBattery(batt);
-            n.setSignal(signal);
-            n.setLastSeen(now());
-            notifyNodeChange(n);
-        }));
-        jitter.setCycleCount(Timeline.INDEFINITE);
-        jitter.play();
-        activeTimelines.add(jitter);
-    }
-
-    // ------------------------------------------------------------------ //
     //  Live alert integration (REST polling from Local EOC)
     // ------------------------------------------------------------------ //
 
@@ -196,7 +164,6 @@ public class SimulationService {
     private void stopAll() {
         activeTimelines.forEach(Timeline::stop);
         activeTimelines.clear();
-        startJitterLoop();          // restart jitter
         activeScenario = null;
     }
 
