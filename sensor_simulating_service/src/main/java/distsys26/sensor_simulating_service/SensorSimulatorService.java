@@ -1,13 +1,14 @@
 package distsys26.sensor_simulating_service;
 
 import distsys26.sensor_simulating_service.enums.SensorType;
-import distsys26.sensor_simulating_service.models.SensorReading;
+import distsys26.sensor_simulating_service.models.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.ResourceAccessException;
 
 /**
  * Service class responsible for simulating sensor readings and sending them to the local EOC.
@@ -29,12 +30,12 @@ public class SensorSimulatorService {
     private ConcurrentHashMap<SensorType, Integer> sensorTypeToSensorCountMap = 
                     SensorReadingGenerator.generatedSensorCount();
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 2500)
     public void sendBarometer() {
         postReading(SensorType.BAROMETER);
     }
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 2500)
     public void sendAnemometer() {
         postReading(SensorType.ANEMOMETER);
     }
@@ -86,6 +87,11 @@ public class SensorSimulatorService {
             SensorReading reading = SensorReadingGenerator.generateRandomSensorReading(sensorType, i, sharedSeedingValue);
             post(reading);
         }
+        SensorValue sensorValue = Mapping.sensorToGeneralValuesMap.get(sensorType);
+        System.out.printf("Posted %d readings for sensor type: %s, seeding value: %f (%s), range: [%.2f, %.2f]\n", 
+                                sensorCount, sensorType, sharedSeedingValue, 
+                                sensorValue.unit, sensorValue.general_min, sensorValue.general_max
+                            );
         SensorReadingGenerator.updateSeedingValues(sensorType, sensorTypeToSeedingValueMap);
     }
 
@@ -96,8 +102,14 @@ public class SensorSimulatorService {
     private void post(SensorReading reading) {
         try {
             restTemplate.postForObject(EOC_URL, reading, String.class);
+        } catch (ResourceAccessException e) {
+            System.out.println("Failed to connect to the local EOC at " + EOC_URL + 
+                                ". Please ensure the local EOC is running and the URL is correct."
+                                );
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("An unexpected error occurred while posting sensor reading." + 
+                                    " Error message: " + e.getMessage()
+                                );
         }
     }
 

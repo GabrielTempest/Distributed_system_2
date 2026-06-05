@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "eoc.local.id",
+      "type": "java.lang.String",
+      "description": "Unique identifier for this Local EOC instance (e.g. LOCAL-EOC-01)."
+    },
+    {
+      "name": "eoc.alerts.topic",
+      "type": "java.lang.String",
+      "description": "Kafka topic name on which disaster alerts are published."
+    }
+  ]
+}
