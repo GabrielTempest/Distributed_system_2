@@ -13,23 +13,19 @@ public class EventLogPanel extends VBox {
 
     public EventLogPanel() {
         setSpacing(0);
-        setPadding(new Insets(14, 16, 12, 16));
-        setStyle("-fx-background-color: #070e18;");
-        setBorder(new Border(new BorderStroke(
-            Color.web("#0e1e2e"), BorderStrokeStyle.SOLID,
-            CornerRadii.EMPTY, new BorderWidths(0, 0, 1, 0)
-        )));
+        setPadding(new Insets(20, 20, 16, 20));
+        setStyle("-fx-background-color: #060e18;");
         VBox.setVgrow(this, Priority.ALWAYS);
 
         Label header = sectionHeader("EVENT LOG");
 
         listView.setStyle(
-            "-fx-background-color: #050c14;" +
-            "-fx-border-color: #0e1e2e;" +
-            "-fx-border-radius: 3; -fx-background-radius: 3;"
+            "-fx-background-color: #0a1628;" +
+            "-fx-border-color: #1a2e42;" +
+            "-fx-border-radius: 6; -fx-background-radius: 6;"
         );
-        listView.setPrefHeight(200);
-        listView.setMinHeight(100);
+        listView.setPrefHeight(300);
+        listView.setMinHeight(150);
         VBox.setVgrow(listView, Priority.ALWAYS);
 
         listView.setCellFactory(lv -> new ListCell<>() {
@@ -42,18 +38,20 @@ public class EventLogPanel extends VBox {
                     return;
                 }
                 setText(item);
-                setFont(Font.font("Monospace", FontWeight.NORMAL, 10));
-                setStyle("-fx-background-color: transparent; -fx-padding: 2 6 2 6;");
+                setFont(Font.font("Monospace", FontWeight.NORMAL, 12));
+                setStyle("-fx-background-color: transparent; -fx-padding: 4 10 4 10;");
+
                 if      (item.contains(" ERROR ")) setTextFill(Color.web("#e06c75"));
                 else if (item.contains(" WARN  ")) setTextFill(Color.web("#e5a840"));
                 else if (item.contains(" INFO  ")) setTextFill(Color.web("#56b6c2"));
-                else                               setTextFill(Color.web("#2a4050"));
+                else if (item.contains(" LIVE  ")) setTextFill(Color.web("#c678dd"));
+                else                               setTextFill(Color.web("#7ab8cc"));
             }
         });
 
-        Label placeholder = new Label("Run a scenario to see events…");
-        placeholder.setTextFill(Color.web("#1e3040"));
-        placeholder.setFont(Font.font("Monospace", 10));
+        Label placeholder = new Label("Run a scenario or start the backend to see events…");
+        placeholder.setTextFill(Color.web("#2a4050"));
+        placeholder.setFont(Font.font("Monospace", 12));
         listView.setPlaceholder(placeholder);
 
         getChildren().addAll(header, listView);
@@ -68,9 +66,9 @@ public class EventLogPanel extends VBox {
 
     private Label sectionHeader(String text) {
         Label l = new Label(text);
-        l.setFont(Font.font("Monospace", FontWeight.BOLD, 9));
-        l.setTextFill(Color.web("#1e3848"));
-        l.setPadding(new Insets(0, 0, 6, 0));
+        l.setFont(Font.font("Monospace", FontWeight.BOLD, 11));
+        l.setTextFill(Color.web("#4a8fa8"));
+        l.setPadding(new Insets(0, 0, 10, 0));
         return l;
     }
 }

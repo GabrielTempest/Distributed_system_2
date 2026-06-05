@@ -41,7 +41,7 @@ public class CsvDataLoader {
         kafkaQueues.clear();
         logTemplates.clear();
 
-        List<String> lines = Files.readAllLines(csvPath);
+        List<String> lines = Files.readAllLines(csvPath, java.nio.charset.StandardCharsets.UTF_8);
         String currentSection = "";
 
         for (String raw : lines) {

@@ -20,7 +20,7 @@ A distributed system that ingests sensor readings, classifies disaster risk leve
 | **National EOC** | `8090` | Consumes alerts from all local EOCs |
 | **Sensor Simulator** | *(no HTTP server)* | Generates fake readings and POSTs them to Local EOC |
 
-**Kafka topic:** `disaster-alerts` (3 partitions, 1 replica)  
+**Kafka topic:** `disaster-alerts` (3 partitions, 1 replica)
 **Alert key:** `disasterType` name — so messages for the same disaster type always go to the same partition.
 
 ---

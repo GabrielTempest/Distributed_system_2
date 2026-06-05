@@ -14,6 +14,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+// Maps disaster types (from Local EOC) to the node IDs most affected by each
+// FLOOD → Can Tho (Mekong Delta), TYPHOON → Da Nang (central coast), LANDSLIDE → Nghe An (mountains)
+
 /**
  * Drives all live simulation:
  *  • Scenario event-log playback (one log line every ~600 ms)
@@ -24,6 +27,12 @@ public class SimulationService {
 
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    private static final Map<String, String> DISASTER_NODE_MAP = Map.of(
+        "FLOOD",     "CT",
+        "TYPHOON",   "DN",
+        "LANDSLIDE", "NA"
+    );
 
     // Observable list that the EventLogPanel binds to
     private final ObservableList<String> eventLog =
@@ -153,6 +162,31 @@ public class SimulationService {
         jitter.setCycleCount(Timeline.INDEFINITE);
         jitter.play();
         activeTimelines.add(jitter);
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Live alert integration (REST polling from Local EOC)
+    // ------------------------------------------------------------------ //
+
+    /** Called on the JavaFX thread whenever a disaster alert level changes. */
+    public void onLiveAlert(String disasterType, String alertLevel) {
+        String time = now();
+        eventLog.add(0, String.format("[%s] LIVE  | %s alert → %s", time, disasterType, alertLevel));
+
+        String nodeId = DISASTER_NODE_MAP.get(disasterType);
+        if (nodeId == null) return;
+
+        SensorNode node = nodeMap.get(nodeId);
+        if (node == null) return;
+
+        NodeStatus status = switch (alertLevel) {
+            case "RED", "ORANGE" -> NodeStatus.ERROR;
+            case "YELLOW"        -> NodeStatus.WARNING;
+            default              -> NodeStatus.OK;
+        };
+        node.setStatus(status);
+        node.setLastSeen(time);
+        notifyNodeChange(node);
     }
 
     // ------------------------------------------------------------------ //

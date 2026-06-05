@@ -40,6 +40,8 @@ public class MapPanel extends VBox {
             if (newState == Worker.State.SUCCEEDED) {
                 pageReady = true;
                 System.out.println("Map page loaded.");
+                // Leaflet captures container size at init; give the layout a moment to settle
+                engine.executeScript("setTimeout(function(){ map.invalidateSize(); }, 300);");
                 if (pendingNodes != null) {
                     plotNodes(pendingNodes);
                     pendingNodes = null;
@@ -47,6 +49,14 @@ public class MapPanel extends VBox {
             } else if (newState == Worker.State.FAILED) {
                 System.err.println("Map page FAILED to load: " + engine.getLocation());
             }
+        });
+
+        // Re-invalidate whenever the WebView is resized (e.g. window resize)
+        webView.widthProperty().addListener((obs, o, n) -> {
+            if (pageReady) engine.executeScript("map.invalidateSize();");
+        });
+        webView.heightProperty().addListener((obs, o, n) -> {
+            if (pageReady) engine.executeScript("map.invalidateSize();");
         });
 
         // Log JS errors
@@ -93,16 +103,21 @@ public class MapPanel extends VBox {
         }
     }
 
+    private static String escapeJs(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "");
+    }
+
     private void plotNodes(Collection<SensorNode> nodes) {
         for (SensorNode node : nodes) {
             String js = String.format(
                 "addSensorNode('%s', '%s', %f, %f, '%s', '%s');",
-                node.getId(),
-                node.getNameVn(),
-                node.getLatPx(),   // real latitude  (from CSV col 5)
-                node.getLngPx(),   // real longitude (from CSV col 6)
-                node.getType().toColorHex(),
-                node.getStatus().name()
+                escapeJs(node.getId()),
+                escapeJs(node.getNameVn()),
+                node.getLatPx(),
+                node.getLngPx(),
+                escapeJs(node.getType().toColorHex()),
+                escapeJs(node.getStatus().name())
             );
             try {
                 engine.executeScript(js);
@@ -116,8 +131,8 @@ public class MapPanel extends VBox {
         if (!pageReady) return;
         String js = String.format(
             "updateNodeStatus('%s', '%s');",
-            node.getId(),
-            node.getStatus().name()
+            escapeJs(node.getId()),
+            escapeJs(node.getStatus().name())
         );
         try {
             engine.executeScript(js);

@@ -6,39 +6,17 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body, #map { width:100%; height:100vh; }
-  html, body {
-    background-color: #060e18 !important;
-  }
-  /* Remove ALL Leaflet default white boxes */
-  .leaflet-div-icon { background:transparent !important; border:none !important; }
+  html, body, #map { width:100%; height:100vh; background-color:#060e18; }
 
-  /* Zoom buttons */
-  .leaflet-bar a { background-color:#0d2235 !important; color:#56b6c2 !important; border-color:#1a3a52 !important; }
+  .leaflet-div-icon { background:transparent !important; border:none !important; }
+  .leaflet-bar a {
+    background-color:#0d2235 !important;
+    color:#56b6c2 !important;
+    border-color:#1a3a52 !important;
+  }
   .leaflet-bar a:hover { background-color:#162d40 !important; }
   .leaflet-control-attribution { display:none; }
 
-  /* Tooltip — fully dark, no white arrow */
-  .eoc-tooltip {
-    background: #0a1e30 !important;
-    border: 1px solid #1a3a52 !important;
-    border-radius: 4px !important;
-    color: #7ab8cc !important;
-    font-family: 'Courier New', monospace !important;
-    font-size: 11px !important;
-    padding: 6px 10px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.6) !important;
-    white-space: nowrap;
-  }
-  /* Kill the white arrow on all tooltip directions */
-  .eoc-tooltip::before,
-  .leaflet-tooltip-left::before,
-  .leaflet-tooltip-right::before,
-  .leaflet-tooltip-top::before,
-  .leaflet-tooltip-bottom::before {
-    display: none !important;
-    border: none !important;
-  }
   .leaflet-tooltip {
     background: #0a1e30 !important;
     border: 1px solid #1a3a52 !important;
@@ -49,14 +27,14 @@
     padding: 3px 7px !important;
   }
   .leaflet-tooltip::before,
-  .leaflet-tooltip-right::before,
-  .leaflet-tooltip-left::before,
   .leaflet-tooltip-top::before,
-  .leaflet-tooltip-bottom::before {
-      display: none !important;
-      border: none !important;
-      content: none !important;
-}
+  .leaflet-tooltip-bottom::before,
+  .leaflet-tooltip-left::before,
+  .leaflet-tooltip-right::before {
+    display: none !important;
+    border: none !important;
+    content: none !important;
+  }
 </style>
 </head>
 <body>
@@ -71,27 +49,27 @@ var map = L.map('map', {
 });
 
 map.getContainer().style.backgroundColor = '#060e18';
-// Dark tile layer
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-  subdomains: 'abcd', maxZoom: 19
+
+// Single tile layer (dark_all includes both base and city labels) — avoids
+// the shadowPane rendering bug that produced the dark rectangle in JavaFX WebView
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd',
+  maxZoom: 19
 }).addTo(map);
 
-// City labels on top
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-  subdomains: 'abcd', maxZoom: 19, pane: 'shadowPane'
-}).addTo(map);
-
-// ── Markers ───────────────────────────────────────────────
-var markers = {};
+var markers    = {};
+var allLatLngs = [];
+var fitTimer   = null;
 var statusColors = {
   OK: '#00cc66', WARNING: '#e5a840', ERROR: '#e06c75', OFFLINE: '#444c5a'
 };
 
 function addSensorNode(id, nameVn, lat, lng, typeColor, status) {
-  var color = statusColors[status] || typeColor;
+  var color  = statusColors[status] || typeColor;
+  var latLng = [lat, lng];
+  allLatLngs.push(latLng);
 
-  // Dot
-  var circle = L.circleMarker([lat, lng], {
+  var circle = L.circleMarker(latLng, {
     radius:      id === 'HN' ? 9 : 7,
     fillColor:   color,
     color:       '#04080f',
@@ -100,7 +78,19 @@ function addSensorNode(id, nameVn, lat, lng, typeColor, status) {
     fillOpacity: 1
   }).addTo(map);
 
+  circle.bindTooltip(nameVn || id, {
+    direction: 'top',
+    offset:    [0, -8],
+    permanent: false
+  });
+
   markers[id] = { circle: circle };
+
+  // Debounce: fit to all nodes once, 600 ms after the last node is added
+  if (fitTimer) clearTimeout(fitTimer);
+  fitTimer = setTimeout(function() {
+    map.fitBounds(allLatLngs, { padding: [30, 30], maxZoom: 6 });
+  }, 600);
 }
 
 function updateNodeStatus(id, status) {
