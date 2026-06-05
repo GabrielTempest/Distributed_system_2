@@ -14,35 +14,26 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-/**
- * Drives all live simulation:
- *  • Scenario event-log playback (one log line every ~600 ms)
- *  • Periodic battery / signal jitter on all nodes
- *  • Node status changes during scenarios
- */
 public class SimulationService {
 
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    // Observable list that the EventLogPanel binds to
     private final ObservableList<String> eventLog =
             FXCollections.observableArrayList();
 
-    // All loaded nodes, keyed by ID
     private final Map<String, SensorNode> nodeMap = new LinkedHashMap<>();
 
-    // Callbacks registered by the MapPanel to be notified when a node changes
+    // Fires on every change (battery/signal jitter + scenario) → NodeStatusPanel
     private final List<Consumer<SensorNode>> nodeChangeListeners = new ArrayList<>();
 
-    // Active animations (cancelled before starting a new scenario)
+    // Fires ONLY on scenario status changes → MapPanel
+    private final List<Consumer<SensorNode>> scenarioChangeListeners = new ArrayList<>();
+
     private final List<Timeline> activeTimelines = new ArrayList<>();
+    private Timeline jitterTimeline = null;
 
     private Scenario activeScenario = null;
-
-    // ------------------------------------------------------------------ //
-    //  Setup
-    // ------------------------------------------------------------------ //
 
     public void loadNodes(List<SensorNode> nodes) {
         nodeMap.clear();
@@ -51,39 +42,43 @@ public class SimulationService {
     }
 
     public ObservableList<String> getEventLog() { return eventLog; }
+    public Map<String, SensorNode> getNodeMap()  { return Collections.unmodifiableMap(nodeMap); }
 
-    public Map<String, SensorNode> getNodeMap() {
-        return Collections.unmodifiableMap(nodeMap);
-    }
-
+    /** Called by NodeStatusPanel — fires on jitter + scenario changes */
     public void addNodeChangeListener(Consumer<SensorNode> l) {
         nodeChangeListeners.add(l);
+    }
+
+    /** Called by MapPanel — fires ONLY on scenario status changes, not jitter */
+    public void addScenarioChangeListener(Consumer<SensorNode> l) {
+        scenarioChangeListeners.add(l);
     }
 
     private void notifyNodeChange(SensorNode node) {
         for (Consumer<SensorNode> l : nodeChangeListeners) l.accept(node);
     }
 
+    private void notifyScenarioChange(SensorNode node) {
+        for (Consumer<SensorNode> l : scenarioChangeListeners) l.accept(node);
+    }
+
     // ------------------------------------------------------------------ //
     //  Scenario playback
     // ------------------------------------------------------------------ //
-
     public void runScenario(Scenario scenario) {
-        // Cancel any running scenario
-        stopAll();
+        stopScenario();
         eventLog.clear();
         activeScenario = scenario;
 
         SensorNode target = nodeMap.get(scenario.getTargetNodeId());
-
         List<String> templates = scenario.getLogTemplates();
+
         if (templates == null || templates.isEmpty()) {
             eventLog.add(now() + " INFO  | Scenario \"" + scenario.getName() + "\" started");
             return;
         }
 
         AtomicInteger idx = new AtomicInteger(0);
-
         Timeline tl = new Timeline();
         tl.setCycleCount(templates.size());
 
@@ -97,7 +92,7 @@ public class SimulationService {
 
             Platform.runLater(() -> eventLog.add(0, line));
 
-            // Update node status based on scenario severity
+            // Update node status — notify BOTH listeners (status panel + map)
             if (target != null) {
                 NodeStatus ns = switch (scenario.getSeverity()) {
                     case CRITICAL -> NodeStatus.ERROR;
@@ -106,7 +101,9 @@ public class SimulationService {
                 };
                 Platform.runLater(() -> {
                     target.setStatus(ns);
+                    // notify status panel
                     notifyNodeChange(target);
+                    notifyScenarioChange(target);  // only map gets this
                 });
             }
         });
@@ -117,8 +114,10 @@ public class SimulationService {
                 Platform.runLater(() -> {
                     target.setStatus(NodeStatus.OK);
                     notifyNodeChange(target);
+                    notifyScenarioChange(target);  // reset map dot color too
                 });
             }
+            activeScenario = null;
         });
 
         activeTimelines.add(tl);
@@ -126,19 +125,18 @@ public class SimulationService {
     }
 
     // ------------------------------------------------------------------ //
-    //  Background jitter loop (simulates live sensor noise)
+    //  Jitter loop — only notifies nodeChangeListeners (NOT map)
     // ------------------------------------------------------------------ //
-
     private void startJitterLoop() {
+        if (jitterTimeline != null) jitterTimeline.stop();
         Random rng = new Random();
 
-        Timeline jitter = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
-            // Pick a random node to jitter
+        jitterTimeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
             List<SensorNode> all = new ArrayList<>(nodeMap.values());
             if (all.isEmpty()) return;
             SensorNode n = all.get(rng.nextInt(all.size()));
 
-            // Only jitter if no active critical scenario on this node
+            // Skip if scenario is actively changing this node
             if (activeScenario != null
                     && activeScenario.getTargetNodeId().equals(n.getId())
                     && n.getStatus() == NodeStatus.ERROR) return;
@@ -148,21 +146,18 @@ public class SimulationService {
             n.setBattery(batt);
             n.setSignal(signal);
             n.setLastSeen(now());
-            notifyNodeChange(n);
+
+            // Only notify status panel — NOT the map (avoids WebView repaint flash)
+            Platform.runLater(() -> notifyNodeChange(n));
         }));
-        jitter.setCycleCount(Timeline.INDEFINITE);
-        jitter.play();
-        activeTimelines.add(jitter);
+
+        jitterTimeline.setCycleCount(Timeline.INDEFINITE);
+        jitterTimeline.play();
     }
 
-    // ------------------------------------------------------------------ //
-    //  Helpers
-    // ------------------------------------------------------------------ //
-
-    private void stopAll() {
+    private void stopScenario() {
         activeTimelines.forEach(Timeline::stop);
         activeTimelines.clear();
-        startJitterLoop();          // restart jitter
         activeScenario = null;
     }
 

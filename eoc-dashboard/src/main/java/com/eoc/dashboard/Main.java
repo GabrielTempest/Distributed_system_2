@@ -4,12 +4,10 @@ import com.eoc.dashboard.model.*;
 import com.eoc.dashboard.service.*;
 import com.eoc.dashboard.view.*;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.*;
 import javafx.stage.*;
 
 import java.io.*;
@@ -48,12 +46,6 @@ public class Main extends Application {
             return h;
         });
 
-        MapPanel mapPanel = safeBuild("MapPanel", errors, () -> {
-            MapPanel m = new MapPanel();
-            m.initNodes(loader.getNodes());
-            return m;
-        });
-
         ScenarioPanel scenarioPanel = safeBuild("ScenarioPanel", errors, () -> {
             ScenarioPanel s = new ScenarioPanel();
             s.loadScenarios(loader.getScenarios());
@@ -79,66 +71,32 @@ public class Main extends Application {
         });
 
         if (scenarioPanel != null) scenarioPanel.setOnScenarioSelected(sim::runScenario);
+
         sim.addNodeChangeListener(node -> {
             if (nodeStatusPanel != null) nodeStatusPanel.updateNode(node);
         });
 
-        // // Map only updates on scenario status changes (not jitter)
-        // sim.addScenarioChangeListener(node -> {
-        //     if (mapPanel != null) mapPanel.updateNode(node);
-        // });
-
-        // ---- Root layout: HBox(map | right) inside BorderPane ----
-        // Avoid SplitPane + ScrollPane nesting which breaks on some JavaFX/Windows combos
-
-        // Map column — fixed width, scrollable vertically
-        VBox mapColumn = new VBox();
-        mapColumn.setStyle("-fx-background-color: #060e18;");
-        mapColumn.setPrefWidth(380);
-        mapColumn.setMinWidth(380);
-        mapColumn.setMaxWidth(380);
-        if (mapPanel != null) {
-            mapPanel.setPrefWidth(380);
-            mapColumn.getChildren().add(mapPanel);
-        }
-
-        // Right column — fills remaining space
+        // ---- Right column ----
         VBox rightColumn = new VBox();
         rightColumn.setStyle("-fx-background-color: #070e18;");
-        HBox.setHgrow(rightColumn, Priority.ALWAYS);
         if (scenarioPanel   != null) rightColumn.getChildren().add(scenarioPanel);
         if (kafkaPanel      != null) rightColumn.getChildren().add(kafkaPanel);
         if (eventLogPanel   != null) rightColumn.getChildren().add(eventLogPanel);
         if (nodeStatusPanel != null) rightColumn.getChildren().add(nodeStatusPanel);
 
-        // Wrap right column in scroll
         ScrollPane rightScroll = new ScrollPane(rightColumn);
         rightScroll.setFitToWidth(true);
-        rightScroll.setFitToHeight(false);
         rightScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         rightScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         rightScroll.setStyle("-fx-background-color: #070e18; -fx-background: #070e18;");
-        HBox.setHgrow(rightScroll, Priority.ALWAYS);
+        VBox.setVgrow(rightScroll, Priority.ALWAYS);
 
-        // Divider line between map and right panel
-        Region divider = new Region();
-        divider.setPrefWidth(1);
-        divider.setMinWidth(1);
-        divider.setMaxWidth(1);
-        divider.setStyle("-fx-background-color: #0e1e2e;");
-
-        // Main body
-        HBox body = new HBox();
-        body.setStyle("-fx-background-color: #060e18;");
-        VBox.setVgrow(body, Priority.ALWAYS);
-        body.getChildren().addAll(mapColumn, divider, rightScroll);
-
-        // Full root
+        // ---- Root ----
         VBox root = new VBox();
         root.setStyle("-fx-background-color: #060e18;");
         if (header != null) root.getChildren().add(header);
-        root.getChildren().add(body);
-        VBox.setVgrow(body, Priority.ALWAYS);
+        root.getChildren().add(rightScroll);
+        VBox.setVgrow(rightScroll, Priority.ALWAYS);
 
         Scene scene = new Scene(root, 1380, 860);
         scene.setFill(Color.web("#060e18"));
@@ -153,7 +111,6 @@ public class Main extends Application {
         System.out.println("UI rendered. Errors: " + errors.size());
     }
 
-    // ---- Safe builder ----
     @FunctionalInterface interface Builder<T> { T build() throws Exception; }
 
     private <T> T safeBuild(String name, List<String> errors, Builder<T> b) {
@@ -170,7 +127,6 @@ public class Main extends Application {
         }
     }
 
-    // ---- CSV resolution ----
     private Path resolveCsvPath(Stage stage) {
         Path p1 = Paths.get("data", "sensor_data.csv");
         if (Files.exists(p1)) { System.out.println("CSV: " + p1.toAbsolutePath()); return p1; }
@@ -199,7 +155,6 @@ public class Main extends Application {
         return chosen != null ? chosen.toPath() : null;
     }
 
-    // ---- Error dialog ----
     private void showErrorDialog(Stage stage, String header, Exception e) {
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
