@@ -20,6 +20,8 @@ public final class Mapping {
         put(SensorType.SOILMOISTURE, new SensorValue(0, 100, "%", "SM"));
         put(SensorType.TILT, new SensorValue(0, 90, "degrees", "TL"));
         put(SensorType.VIBRATION, new SensorValue(0, 16, "g", "VBR"));
+        put(SensorType.TEMPERATURE, new SensorValue(-30, 50, "°C", "TMP"));
+        put(SensorType.HUMIDITY, new SensorValue(0, 100, "%", "HMD"));
     }};
     
 }

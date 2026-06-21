@@ -11,5 +11,7 @@ public enum SensorType {
     FLOODGAUGE,
     VIBRATION,
     TILT,
-    SOILMOISTURE    
+    SOILMOISTURE,
+    TEMPERATURE,
+    HUMIDITY
 }

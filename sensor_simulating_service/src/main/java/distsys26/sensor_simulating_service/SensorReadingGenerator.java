@@ -10,7 +10,7 @@ import java.util.Random;
 
 public final class SensorReadingGenerator {
     private static final Random random = new Random();
-    private static int fluctuation_percentage = 30;
+    private static int fluctuation_percentage = 60;
 
     public static final ConcurrentHashMap<SensorType, Integer> generatedSensorCount() {
         ConcurrentHashMap<SensorType, Integer> sensorCountMap = new ConcurrentHashMap<>();
@@ -46,9 +46,16 @@ public final class SensorReadingGenerator {
                                     ConcurrentHashMap<SensorType, Double> sensorTypeToSeedingValueMap
     ) {
         double currentSeedingValue = sensorTypeToSeedingValueMap.get(sensorType);
-        double fluctuation_rate = (double) fluctuation_percentage / 100;
-        double fluctuation = random.nextDouble() * fluctuation_rate*2 - fluctuation_rate;
-        sensorTypeToSeedingValueMap.put(sensorType, currentSeedingValue * (1 + fluctuation));
+        double newSeedingValue;
+        if (currentSeedingValue > 1) {
+            double fluctuation_rate = (double) fluctuation_percentage / 100;
+            double fluctuation = random.nextDouble() * fluctuation_rate*2 - fluctuation_rate;
+            newSeedingValue = currentSeedingValue * (1 + fluctuation);
+        } else {
+            SensorValue sensorValue = Mapping.sensorToGeneralValuesMap.get(sensorType);
+            newSeedingValue = random.nextDouble() * (sensorValue.general_max - sensorValue.general_min) + sensorValue.general_min;
+        }
+        sensorTypeToSeedingValueMap.put(sensorType, newSeedingValue);
     }
 
     /**

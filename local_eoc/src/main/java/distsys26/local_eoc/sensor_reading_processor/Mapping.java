@@ -24,6 +24,21 @@ public final class Mapping {
         put(DisasterType.LANDSLIDE, List.of(
             SensorType.RAINGAUGE, SensorType.SOILMOISTURE, SensorType.TILT, SensorType.VIBRATION
         ));
+        put(DisasterType.WILDFIRE, List.of(
+            SensorType.TEMPERATURE, SensorType.HUMIDITY, SensorType.ANEMOMETER, SensorType.RAINGAUGE
+        ));
+        put(DisasterType.EARTHQUAKE, List.of(
+            SensorType.VIBRATION
+        ));
+        put(DisasterType.DROUGHT, List.of(
+            SensorType.SOILMOISTURE, SensorType.HUMIDITY, SensorType.RAINGAUGE
+        ));
+        put(DisasterType.HEATWAVE, List.of(
+            SensorType.TEMPERATURE, SensorType.HUMIDITY, SensorType.ANEMOMETER
+        ));
+        put(DisasterType.COLDSPELL, List.of(
+            SensorType.TEMPERATURE, SensorType.HUMIDITY, SensorType.ANEMOMETER
+        ));
     }};
 
     /**
@@ -38,6 +53,8 @@ public final class Mapping {
         put(SensorType.SOILMOISTURE, new int[]{40, 60, 80});
         put(SensorType.TILT, new int[]{10, 30, 50});
         put(SensorType.VIBRATION, new int[]{2, 6, 10});
+        put(SensorType.TEMPERATURE, new int[]{25, 35, 45});
+        put(SensorType.HUMIDITY, new int[]{70, 85, 95});
     }};
     
 }

@@ -1,4 +1,4 @@
-package distsys26.national_eoc.enums;
+package distsys26.database_writer.enums;
 
 public enum DisasterType {
     FLOOD,
