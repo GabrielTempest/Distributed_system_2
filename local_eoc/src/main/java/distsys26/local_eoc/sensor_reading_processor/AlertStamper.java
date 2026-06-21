@@ -62,6 +62,24 @@ public final class AlertStamper {
             case LANDSLIDE:
                 stamper = new LandslideStamper();
                 break;
+            case WILDFIRE:
+                stamper = new WildfireStamper();
+                break;
+            case EARTHQUAKE:
+                stamper = new EarthquakeStamper();
+                break;
+            case DROUGHT:
+                stamper = new DroughtStamper();
+                break;
+            case HEATWAVE:
+                stamper = new HeatwaveStamper();
+                break;
+            case COLDSPELL:
+                stamper = new ColdspellStamper();
+                break;
+            default:
+                // Unsupported disaster type, return null
+                return null;
         }
         return stamper == null ? null : stamper.stamp(scores, prebuildAlert);
     }

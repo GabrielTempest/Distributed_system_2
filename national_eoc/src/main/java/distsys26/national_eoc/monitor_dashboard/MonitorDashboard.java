@@ -8,6 +8,8 @@ import javafx.stage.WindowEvent;
 
 public class MonitorDashboard extends Application {
     public static AlertTable alertTable = new AlertTable();
+    private static int VIEWPORT_WIDTH = 400;
+    private static int VIEWPORT_HEIGHT = 300;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -21,8 +23,8 @@ public class MonitorDashboard extends Application {
         });
 
         primaryStage.setTitle("Alert Monitor Dashboard");
-        primaryStage.setWidth(600);
-        primaryStage.setHeight(400);
+        primaryStage.setWidth(VIEWPORT_WIDTH);
+        primaryStage.setHeight(VIEWPORT_HEIGHT);
         primaryStage.setScene(new Scene(alertTable));
         primaryStage.show();
 

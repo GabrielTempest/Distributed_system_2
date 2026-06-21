@@ -6,5 +6,10 @@ package distsys26.local_eoc.enums;
 public enum DisasterType {
     FLOOD,
     TYPHOON,
-    LANDSLIDE    
+    LANDSLIDE,
+    WILDFIRE,
+    EARTHQUAKE,
+    DROUGHT,
+    HEATWAVE,
+    COLDSPELL
 }
