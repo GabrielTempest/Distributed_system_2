@@ -47,3 +47,22 @@ services:
       - "8080:8080"
     environment:
       KAFKA_BROKERS: redpanda:9092
+
+
+
+# --- ADDED: PostgreSQL Database Service ---
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: disaster_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+# Define a named volume so your data isn't deleted when containers stop
+volumes:
+  postgres_data:

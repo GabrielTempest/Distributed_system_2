@@ -1,13 +1,12 @@
-package distsys26.national_eoc.models;
+package distsys26.database_writer.kafka;
 
-import distsys26.national_eoc.enums.AlertType;
-import distsys26.national_eoc.enums.DisasterType;
+import distsys26.database_writer.enums.*;
 
 import lombok.*;
 
 @Data
 @NoArgsConstructor
-public class Alert {
+public class KafkaDTO {
     private String alertId;
     private String localEocId;
     private DisasterType disasterType;
@@ -17,7 +16,7 @@ public class Alert {
 
     @Override
     public String toString() {
-        return "Alert{alertId='" + alertId + "', localEocId='" + localEocId +
+        return "KafkaDTO{alertId='" + alertId + "', localEocId='" + localEocId +
                "', disasterType=" + disasterType + ", alertType=" + alertType +
                ", message='" + message + "', timestamp='" + timestamp + "'}";
     }

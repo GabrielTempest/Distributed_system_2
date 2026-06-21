@@ -14,17 +14,19 @@ public class AlertTableCell extends Region {
      * Duration to show alert status before resetting to "No Info"
      */
     private static final int STATUS_LIVE_DURATION = 5000;
+    private static String noInfoColor = "grey"; // Default color for "No Info" state
     private String rowId;
     private String colId;
     private String rowColKey;
     private Timeline timeline;
     private Tooltip tooltip;
-    private String noInfoColor = "grey"; // Default color for "No Info" state
+    private String currentColor; // Track the current color of the cell
 
     public AlertTableCell(String rowId, String colId) {
         this.rowId = rowId;
         this.colId = colId;
         this.rowColKey = rowId + "-" + colId;
+        this.currentColor = noInfoColor; // Initialize with "No Info" color
         updateCellColor(); // Set initial color to "No Info"
         installTooltip(rowId + "\n" + colId);
         installAutoResetColor();
@@ -64,7 +66,11 @@ public class AlertTableCell extends Region {
         Platform.runLater(() -> {
             // Stop the existing countdown
             timeline.stop();
-            this.setStyle(String.format("-fx-background-color: %s; -fx-border-color: transparent;", color));
+            // Update the cell color only if it's different from the current color
+            if (!color.equals(currentColor)) {
+                setStyle(String.format("-fx-background-color: %s; -fx-border-color: transparent;", color));
+                currentColor = color;
+            }
             // Start/Restart the countdown from zero
             timeline.playFromStart();
         });
