@@ -1,4 +1,4 @@
-package distsys26.national_eoc.alert_consumer.models;
+package distsys26.national_eoc.models;
 
 import distsys26.national_eoc.enums.AlertType;
 import distsys26.national_eoc.enums.DisasterType;

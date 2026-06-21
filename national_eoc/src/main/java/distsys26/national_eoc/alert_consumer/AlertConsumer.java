@@ -1,10 +1,11 @@
 package distsys26.national_eoc.alert_consumer;
 
-import distsys26.national_eoc.alert_consumer.models.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+
+import distsys26.national_eoc.models.Alert;
 
 @Component
 public class AlertConsumer {
