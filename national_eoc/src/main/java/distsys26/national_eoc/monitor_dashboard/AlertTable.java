@@ -29,7 +29,7 @@ public class AlertTable extends ScrollPane {
     private final Map<String, Integer> eocRowMap = new HashMap<>();
     private final Map<DisasterType, Integer> disasterColMap = new HashMap<>();
     // Tracks individual cell regions via a composite key: "localEocId-disasterType"
-    private final Map<String, Region> cellMap = new HashMap<>();
+    private final Map<String, AlertTableCell> cellMap = new HashMap<>();
 
     public AlertTable() {
         gridPane.setPadding(new Insets(10));
@@ -104,16 +104,9 @@ public class AlertTable extends ScrollPane {
         // Fill row columns with default grey (No Info) cells
         for (Map.Entry<DisasterType, Integer> group : disasterColMap.entrySet()) {
             int colIndex = group.getValue();
-
-            Region cell = new Region();
-            updateCellColor(cell, null); // Default color setup
-
-            Tooltip cellTooltip = new Tooltip(eocId + "\n" + StringUtils.capitalize(group.getKey().toString()));
-            cellTooltip.setShowDelay(Duration.ZERO);
-            Tooltip.install(cell, cellTooltip); // Tooltip for each cell
-
+            AlertTableCell cell = new AlertTableCell(eocId, StringUtils.capitalize(group.getKey().toString()));
             gridPane.add(cell, colIndex, rowIndex);
-            cellMap.put(eocId + "-" + group.getKey(), cell);
+            cellMap.put(cell.getRowColKey(), cell);
         }
     }
 
@@ -127,17 +120,9 @@ public class AlertTable extends ScrollPane {
         }
 
         // Locate the target cell inside our matrix map and paint it
-        Region targetCell = cellMap.get(alert.getLocalEocId() + "-" + alert.getDisasterType().toString());
+        AlertTableCell targetCell = cellMap.get(alert.getLocalEocId() + "-" + alert.getDisasterType().toString());
         if (targetCell != null) {
-            updateCellColor(targetCell, alert.getAlertType());
+            targetCell.updateCellColor(alert.getAlertType());
         }
-    }
-
-    /**
-     * Changes background fill colors programmatically via uniform JavaFX CSS styles
-     */
-    private void updateCellColor(Region cell, AlertType color) {
-        String hexColor = color == null? "grey" : color.toString().toLowerCase();
-        cell.setStyle(String.format("-fx-background-color: %s; -fx-border-color: transparent;", hexColor));
     }
 }
