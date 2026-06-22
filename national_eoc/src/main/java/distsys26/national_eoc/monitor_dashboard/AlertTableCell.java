@@ -20,13 +20,13 @@ public class AlertTableCell extends Region {
     private String rowColKey;
     private Timeline timeline;
     private Tooltip tooltip;
-    private String currentColor; // Track the current color of the cell
+    //private String currentColor; // Track the current color of the cell
 
     public AlertTableCell(String rowId, String colId) {
         this.rowId = rowId;
         this.colId = colId;
         this.rowColKey = rowId + "-" + colId;
-        this.currentColor = noInfoColor; // Initialize with "No Info" color
+        //this.currentColor = noInfoColor; // Initialize with "No Info" color
         updateCellColor(); // Set initial color to "No Info"
         installTooltip(rowId + "\n" + colId);
         installAutoResetColor();
@@ -67,10 +67,11 @@ public class AlertTableCell extends Region {
             // Stop the existing countdown
             timeline.stop();
             // Update the cell color only if it's different from the current color
-            if (!color.equals(currentColor)) {
-                setStyle(String.format("-fx-background-color: %s; -fx-border-color: transparent;", color));
-                currentColor = color;
-            }
+            setStyle(String.format("-fx-background-color: %s; -fx-border-color: transparent;", color));
+            // if (!color.equals(currentColor)) {
+                
+            //     currentColor = color;
+            // }
             // Start/Restart the countdown from zero
             timeline.playFromStart();
         });

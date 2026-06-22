@@ -161,3 +161,20 @@ docker compose down -v
 
 **First run is slow**
 - Maven downloads ~200 MB of dependencies on the first build. Subsequent runs use the local cache and start in seconds.
+
+#### Note
+
+Change the local host at application.properties to the host when you have host
+
+```bash
+spring.kafka.bootstrap-servers=localhost:19092 <---- change this
+// to this
+spring.kafka.bootstrap-servers=[host ip]:19092 <---- To this
+
+sensor_simulating_service\src\main\resources\application.properties 
+also change this
+
+api.base-url=http://localhost:8081 
+
+Change this to 
+```
