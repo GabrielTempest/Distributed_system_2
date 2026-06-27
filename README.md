@@ -55,7 +55,8 @@ The `redpanda-init` container also runs once to pre-create the `disaster-alerts`
 ### Step 2 — Start Services
 - Currently available 3 services: `national_eoc`, `local_eoc` and `database_writer`
 - 3 services can be start in any other, however, please note that `consumers` lies in `local_eoc` nodes.
-- You can start as many `local_eoc` and `national_eoc` as wish, but you would need to change server port in `application.properties` of the nodes if you run muultiple `local_eoc`/`national_eoc` on the same device.
+- You can start as many `local_eoc` and `national_eoc` as wish, but you would need to change server port in `application.properties` of the nodes if you run multiple `local_eoc`/`national_eoc` on the same device.
+- If you
 
 #### Start Local EOC Node
 ```powershell
@@ -78,7 +79,7 @@ mvn spring-boot:run
 ### Step 3 — Start Sensor Simulator
 ```powershell
 cd sensor_simulating_service
-mvn -q -DskipTests spring-boot:run
+mvn spring-boot:run
 ```
 - `sensor_simulating_service` should run on the same device as `local_eoc` so that `local_eoc` can consume readings to generate alerts.
 - Many `sensor_simulating_service` can run on the same devices, however, they will only POST http requests to the `local_eoc` with the default port *8081*.

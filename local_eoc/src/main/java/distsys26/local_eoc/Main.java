@@ -38,17 +38,20 @@ class Main {
             return;
         }
 
-        // Else, publish the generated alerts
-        for (AlertData alertData : alertDataList) {
-            Alert alert = new Alert(
-                    UUID.randomUUID().toString(),
-                    localEocId,
-                    alertData.getDisasterType(),
-                    alertData.getAlertLevel(),
-                    alertData.measurementsToString(),
-                    timestamp
-            );
-            alertPublisher.publish(alert);
+        // An additional loop to increase the number of alerts generated for testing purposes
+        for(int i = 0; i < 1; i++) {
+            // Else, publish the generated alerts
+            for (AlertData alertData : alertDataList) {
+                Alert alert = new Alert(
+                        UUID.randomUUID().toString(),
+                        localEocId,
+                        alertData.getDisasterType(),
+                        alertData.getAlertLevel(),
+                        alertData.measurementsToString(),
+                        timestamp
+                );
+                alertPublisher.publish(alert);
+            }
         }
     }
 }
